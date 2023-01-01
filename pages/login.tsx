@@ -13,14 +13,21 @@ import {
   useColorModeValue,
   FormErrorMessage,
   FormHelperText,
+  useDisclosure,
 } from "@chakra-ui/react";
+import SuccessAlert from "../components/utils/modals/successmodal";
+import { stringify } from "query-string";
 import { EmailValidator } from "../utils/validator";
 import type { LoginWithEmail } from "../components/interfaces";
 import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import Product from "../components/product";
+import { useRouter } from "next/router";
+import axios from "axios";
 export default function LoginForm() {
-  const { register, handleSubmit, formState } = useForm<any>({reValidateMode:'onSubmit'});
+  const { register, handleSubmit, formState } = useForm<any>({
+    reValidateMode: "onSubmit",
+  });
   const { errors } = formState;
   const inputRef = useRef<any>();
   const autoFocus = useCallback((inputElement: any) => {
@@ -29,11 +36,44 @@ export default function LoginForm() {
       inputRef.current = true;
     }
   }, []);
-  const submitHandler = (data: LoginWithEmail) => {
-    console.log("data==", data);
+  const {
+    isOpen: isLoginAlertOpen,
+    onOpen: onLoginAlertOpen,
+    onClose: onLOginAlertClose,
+  } = useDisclosure();
+  const router = useRouter();
+  const postLogin = () => {
+    let redirectUrl = "/";
+    if (router?.query?.hasOwnProperty("next")) {
+      const { next, ...rest } = router?.query;
+      const additionalqueries = stringify(rest, {
+        skipEmptyString: true,
+        skipNull: true,
+      });
+      redirectUrl = next + additionalqueries;
+    }
+    onLoginAlertOpen();
+    setTimeout(() => {
+      onLOginAlertClose();
+      router.push(redirectUrl);
+    }, 5000);
+  };
+  const submitHandler = async (data: LoginWithEmail) => {
+    const payload = data;
+    try {
+      const res = await axios.post("/api/login", payload);
+      console.log("log in response in page", res);
+      postLogin();
+    } catch (error) {
+      console.log(error);
+    }
   };
   console.log("errors==", errors);
   return (
+    <>
+    {
+      isLoginAlertOpen&&<SuccessAlert />
+    }
     <Flex
       minH={"100vh"}
       align={"center"}
@@ -111,5 +151,7 @@ export default function LoginForm() {
         </Box>
       </Stack>
     </Flex>
+    </>
+    
   );
 }

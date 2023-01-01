@@ -50,7 +50,7 @@ import {
         left={0}
         bottom='0px'
         w='100%'
-        zIndex={-1}
+        zIndex={1001}
         >
         <Container
           as={Stack}

@@ -7,15 +7,15 @@ export type Feedback = {
   Reviews?: string;
 };
 export type Product = {
-  Id: number;
+  Product_id: number;
   Name: string;
-  Url: string;
-  Price: number;
-  CategoryId: number;
-  Quantity: number;
   Description: string;
-  Feedback: Feedback;
-  SellerId: number;
+  Image: string;
+  Rate: number;
+  In_stock:number;
+  Ratings_and_reviews:string;
+  Seller: number;
+  Categories: number;
 };
 export interface LoginDataBase {
   password: string;
